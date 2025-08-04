@@ -2,50 +2,48 @@ from flask import Flask, render_template, request
 import requests
 import os
 from dotenv import load_dotenv
-
 load_dotenv()
-#make sure to include url=
-headers = {"User-Agent": "python:subreddit.fetcher:v1.0 (by u/yourusername)"}
-url = os.getenv("URL")
-url2 = os.getenv("URL2")
 
-response = requests.get(url=url, headers=headers)
-response2 = requests.get(url=url2, headers=headers)
-data = response.json()
-data2 = response2.json()
 
-for x in range(10): #top 10 posts
-    print(x)
-    print(data2["data"]["children"][x]["data"]["title"])
-    if data2["data"]["children"][x]["data"]["selftext"] == "":
-        pass
-    else:
-        print(data2["data"]["children"][x]["data"]["selftext"])
-        print(data2["data"]["children"][x]["data"]["url"])
-        url3 = f'{data2["data"]["children"][x]["data"]["url"]}.json' #permalink instead???
-        print(url3)
-        data3 = requests.get(url=url3, headers=headers).json()
-        # print(data3)
+class Reddit_Scrape:
+    def __init__(self):
+        """ah"""
+        self.headers = {"User-Agent": "python:subreddit.fetcher:v1.0 (by u/yourusername)"}
+        self.mainpage = os.getenv("URL")
+
+    def top_post(self, post):
+        """ah"""
+        response = requests.get(url=self.mainpage, headers=self.headers)
+        data = response.json()
+        if data["data"]["children"][post]["data"]["selftext"] == "":
+            pass
+        else:
+            # print(data["data"]["children"][x]["data"]["selftext"])
+            # print(data["data"]["children"][x]["data"]["url"])
+            diction = {post:
+                        {
+                            data["data"]["children"][post]["data"]["title"]:
+                            (data["data"]["children"][post]["data"]["selftext"],
+                            f'https://www.reddit.com{data["data"]["children"][post]["data"]["permalink"]}.json')
+                        }
+                    }
+            self.comments_url = diction[post][list(diction[post].keys())[0]][1] # print(list(post[1].keys())[0]) #dict_keys(['key string']) to just 'key string'
+            return diction
+    def top_comments(self):
+        """ah"""
         try:
-            data3 = requests.get(url=url3, headers=headers).json()
-            # print(data3)
+            data = requests.get(url=self.comments_url, headers=self.headers).json()
+
             for _ in range(3): #3 comments
-                print(f"COMMENT {_}")
-                print(data3[0]['data']['children'][_]['data']['score'])
-                print(data3[0]['data']['children'][_]['data']['body'])
+                print(f"COMMENT {_ + 1}")
+                print(data[1]['data']['children'][_]['data']['score'])
+                print(data[1]['data']['children'][_]['data']['body'])
+                #return something
         except:
             pass
 
-
-
-# print(data)
-
-
-# subreddit = data[0]['data']['children'][0]['data']['subreddit'] #subreddit name
-# print(subreddit)
-# print(data[0]['data']['children'][0]['data']['title']) #post title
-# print(data[0]['data']['children'][0]['data']['selftext']) #post text
-# for _ in range(3): #3 comments
-#     print(f"COMMENT {_}")
-#     print(data[1]['data']['children'][_]['data']['score'])
-#     print(data[1]['data']['children'][_]['data']['body'])
+scrape = Reddit_Scrape()
+print(scrape)
+post = scrape.top_post(3)
+scrape.top_comments()
+# print(list(post[1].keys())[0]) #dict_keys(['key string']) to just 'key string'
