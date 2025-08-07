@@ -29,21 +29,41 @@ class Reddit_Scrape:
                     }
             self.comments_url = diction[post][list(diction[post].keys())[0]][1] # print(list(post[1].keys())[0]) #dict_keys(['key string']) to just 'key string'
             return diction
-    def top_comments(self):
+    def comments(self):
         """ah"""
+        all_comments = {}
         try:
             data = requests.get(url=self.comments_url, headers=self.headers).json()
-
-            for _ in range(3): #3 comments
-                print(f"COMMENT {_ + 1}")
-                print(data[1]['data']['children'][_]['data']['score'])
-                print(data[1]['data']['children'][_]['data']['body'])
+            for _ in range(len(data[1]['data']['children'])): #3 comments
+                all_comments.update({_ : data[1]['data']['children'][_]['data']['body']})
                 #return something
         except:
             pass
-
+        return all_comments
+    def replies(self, comment):
+        """ah"""
+        all_replies = []
+        try:
+            data = requests.get(url=self.comments_url, headers=self.headers).json()
+            for x in range(len(data[1]['data']['children'][comment]['data']['replies']['data']['children'])):#[0]['data']['body']
+                all_replies.append(data[1]['data']['children'][comment]['data']['replies']['data']['children'][x]['data']['body'])
+                try:
+                    for y in range(len(data[1]['data']['children'][comment]['data']['replies']['data']['children'][x]['data']['replies']['data']['children'])):
+                        all_replies.append(data[1]['data']['children'][comment]['data']['replies']['data']['children'][x]['data']['replies']['data']['children'][y]['data']['body'])
+                except:
+                    pass
+        except TypeError:
+            pass
+        return tuple(all_replies)
 scrape = Reddit_Scrape()
-print(scrape)
-post = scrape.top_post(3)
-scrape.top_comments()
+post = scrape.top_post(6)
+print(post)
+print(scrape.comments())
+print(scrape.replies(4))
 # print(list(post[1].keys())[0]) #dict_keys(['key string']) to just 'key string'
+
+
+
+# for x in range(len(data[1]['data']['children'])[_]['data']['replies']['data']['children']):#[0]['data']['body']
+#     print("REPLIES")
+#     print(data[1]['data']['children'][_]['data']['replies']['data']['children'][x]['data']['body'])
