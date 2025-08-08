@@ -10,6 +10,12 @@ from google import genai
 client = genai.Client()
 
 response = client.models.generate_content(
-    model="gemini-2.5-flash", contents=""""""
+    model="gemini-2.5-flash", contents="""Could you please come up with a possible solution?:
+    **insert results of redditscrape**"""
 )
 print(response.text) 
+print(type(response.text))
+
+with open("re.txt", "w") as f:
+    f.write(response.text)
+

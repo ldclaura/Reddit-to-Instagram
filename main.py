@@ -1,65 +1,31 @@
-from flask import Flask, render_template, request
-import requests
-import os
-from dotenv import load_dotenv
-load_dotenv()
+from redditscrape import Reddit_Scrape
 
-
-class Reddit_Scrape:
-    def __init__(self):
-        """ah"""
-        self.headers = {"User-Agent": "python:subreddit.fetcher:v1.0 (by u/yourusername)"}
-        self.mainpage = os.getenv("URL")
-
-    def top_post(self, post):
-        """ah"""
-        response = requests.get(url=self.mainpage, headers=self.headers)
-        data = response.json()
-        if data["data"]["children"][post]["data"]["selftext"] == "":
-            pass
-        else:
-            # print(data["data"]["children"][x]["data"]["selftext"])
-            # print(data["data"]["children"][x]["data"]["url"])
-            diction = {post:
-                        {
-                            data["data"]["children"][post]["data"]["title"]:
-                            (data["data"]["children"][post]["data"]["selftext"],
-                            f'https://www.reddit.com{data["data"]["children"][post]["data"]["permalink"]}.json')
-                        }
-                    }
-            self.comments_url = diction[post][list(diction[post].keys())[0]][1] # print(list(post[1].keys())[0]) #dict_keys(['key string']) to just 'key string'
-            return diction
-    def comments(self):
-        """ah"""
-        all_comments = {}
-        try:
-            data = requests.get(url=self.comments_url, headers=self.headers).json()
-            for _ in range(len(data[1]['data']['children'])): #3 comments
-                all_comments.update({_ : data[1]['data']['children'][_]['data']['body']})
-                #return something
-        except:
-            pass
-        return all_comments
-    def replies(self, comment):
-        """ah"""
-        all_replies = []
-        try:
-            data = requests.get(url=self.comments_url, headers=self.headers).json()
-            for x in range(len(data[1]['data']['children'][comment]['data']['replies']['data']['children'])):#[0]['data']['body']
-                all_replies.append(data[1]['data']['children'][comment]['data']['replies']['data']['children'][x]['data']['body'])
-                try:
-                    for y in range(len(data[1]['data']['children'][comment]['data']['replies']['data']['children'][x]['data']['replies']['data']['children'])):
-                        all_replies.append(data[1]['data']['children'][comment]['data']['replies']['data']['children'][x]['data']['replies']['data']['children'][y]['data']['body'])
-                except:
-                    pass
-        except TypeError:
-            pass
-        return tuple(all_replies)
 scrape = Reddit_Scrape()
-post = scrape.top_post(6)
+post = scrape.top_post(2)
 print(post)
 print(scrape.comments())
-print(scrape.replies(4))
+for x in scrape.comments():
+    print(scrape.replies(x))
+
+
+
+with open("re.txt", "rb") as f:
+    num_lines = sum(1 for _ in f)
+with open("re.txt", "r") as f:
+    for _ in range(num_lines):
+        print("NEW LINE")
+        print("...")
+        print(f.readline())
+# Display edited image
+# img.show()
+
+# Save the edited image
+# img.save("car2.png")
+
+
+
+
+
 # print(list(post[1].keys())[0]) #dict_keys(['key string']) to just 'key string'
 
 
