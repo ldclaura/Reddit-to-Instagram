@@ -16,6 +16,7 @@ class Reddit_Scrape:
         saves url as self.comments_url\n
         e.g. {2: {does someone know this?: where to buy icecream?, www.icecreamqueries.com}}"""
         response = requests.get(url=self.mainpage, headers=self.headers)
+        print(response)
         data = response.json()
         if data["data"]["children"][post]["data"]["selftext"] == "":
             pass
